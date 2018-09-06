@@ -13,13 +13,16 @@ class WebViewExample extends StatefulWidget {
   State createState() => WebViewExampleState();
 }
 
-class WebViewExampleState extends State<WebViewExample> with SingleTickerProviderStateMixin {
+class WebViewExampleState extends State<WebViewExample>
+    with SingleTickerProviderStateMixin {
   TabController tabController;
 
   final List<String> tabs = <String>[
-    'https://flutter.io',
-    'https://news.google.com',
+    'https://www.google.cn/intl/en/events/developerdays2018/',
+    'https://flutter-io.cn',
   ];
+
+  List<String> bookmarks = <String>[];
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +34,13 @@ class WebViewExampleState extends State<WebViewExample> with SingleTickerProvide
           tabs: tabs.map((String url) => new Tab(text: url)).toList(),
         ),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-        actions: <Widget>[const SampleMenu()],
+        actions: <Widget>[
+          BookmarkButton(),
+        ],
       ),
       body: new TabBarView(
         controller: tabController,
-        children: tabs.map((String url) =>  new WebViewTab(url: url)).toList(),
+        children: tabs.map((String url) => new WebViewTab(url: url)).toList(),
       ),
     );
   }
@@ -56,15 +61,17 @@ class WebViewTab extends StatefulWidget {
   State createState() => new WebViewTabState();
 }
 
-class WebViewTabState extends State<WebViewTab> with AutomaticKeepAliveClientMixin {
-
+class WebViewTabState extends State<WebViewTab>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return new WebView(
       initialUrl: widget.url,
       javaScriptMode: JavaScriptMode.unrestricted,
-      gestureRecognizers: <OneSequenceGestureRecognizer>[ new VerticalDragGestureRecognizer() ],
+      gestureRecognizers: <OneSequenceGestureRecognizer>[
+        new VerticalDragGestureRecognizer()
+      ],
     );
   }
 
@@ -72,26 +79,59 @@ class WebViewTabState extends State<WebViewTab> with AutomaticKeepAliveClientMix
   bool get wantKeepAlive => true;
 }
 
-class SampleMenu extends StatelessWidget {
-  const SampleMenu();
+class BookmarkButton extends StatefulWidget {
+  @override
+  BookmarkButtonState createState() {
+    return new BookmarkButtonState();
+  }
+}
+
+class BookmarkButtonState extends State<BookmarkButton> {
+  bool bookmarked = false;
+  var message = "";
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-        Scaffold.of(context).showSnackBar(
-            new SnackBar(content: new Text('You selected: $value')));
+    return IconButton(
+      icon: Icon(bookmarked ? Icons.favorite : Icons.favorite_border),
+      onPressed: () {
+        if (bookmarked) {
+          setState(() {
+            message = "Unbookmarked";
+            bookmarked = false;
+          });
+        } else {
+          setState(() {
+            message = "Bookmarked";
+            bookmarked = true;
+          });
+        }
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(message)));
       },
-      itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-            const PopupMenuItem<String>(
-              value: 'Item 1',
-              child: Text('Item 1'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Item 2',
-              child: Text('Item 2'),
-            ),
-          ],
     );
   }
 }
+
+//class SampleMenu extends StatelessWidget {
+//  const SampleMenu();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return PopupMenuButton<String>(
+//      onSelected: (String value) {
+//        Scaffold.of(context).showSnackBar(
+//            new SnackBar(content: new Text('You selected: $value')));
+//      },
+//      itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+//            const PopupMenuItem<String>(
+//              value: 'Item 1',
+//              child: Text('Item 1'),
+//            ),
+//            const PopupMenuItem<String>(
+//              value: 'Item 2',
+//              child: Text('Item 2'),
+//            ),
+//          ],
+//    );
+//  }
+//}
