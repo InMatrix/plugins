@@ -18,9 +18,11 @@ class WebViewExampleState extends State<WebViewExample>
   TabController tabController;
 
   final List<String> tabs = <String>[
-    'https://www.google.cn/intl/en/events/developerdays2018/',
-    'https://flutter-io.cn',
+    'https://www.google.cn/intl/cn/events/developerdays2018/',
+    'https://flutter.io',
   ];
+
+  static const String flutter_cn_url = 'https://flutter-io.cn';
 
   List<String> bookmarks = <String>[];
 
@@ -40,7 +42,10 @@ class WebViewExampleState extends State<WebViewExample>
       ),
       body: new TabBarView(
         controller: tabController,
-        children: tabs.map((String url) => new WebViewTab(url: url)).toList(),
+        children: <Widget>[
+          AnimatedWebViewTab(url1: tabs[0]),
+          AnimatedWebViewTab(url1: tabs[1], url2: flutter_cn_url),
+        ],
       ),
     );
   }
@@ -52,22 +57,46 @@ class WebViewExampleState extends State<WebViewExample>
   }
 }
 
-class WebViewTab extends StatefulWidget {
-  const WebViewTab({Key key, this.url}) : super(key: key);
+class AnimatedWebViewTab extends StatefulWidget {
+  AnimatedWebViewTab({Key key, this.url1, this.url2}) : super(key: key);
 
-  final String url;
+  final String url1;
+  final String url2;
 
   @override
-  State createState() => new WebViewTabState();
+  _AnimatedWebViewTabState createState() => _AnimatedWebViewTabState();
 }
 
-class WebViewTabState extends State<WebViewTab>
+class _AnimatedWebViewTabState extends State<AnimatedWebViewTab>
     with AutomaticKeepAliveClientMixin {
+  bool _first = true;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return new WebView(
-      initialUrl: widget.url,
+    if(widget.url2 != null) {
+      return GestureDetector(
+        onDoubleTap: () {
+          setState(() {
+            _first = !_first;
+          });
+        },
+        child: AnimatedCrossFade(
+          duration: const Duration(seconds: 3),
+          firstChild: getWebView(widget.url1),
+          secondChild: getWebView(widget.url2),
+          crossFadeState:
+          _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+        ),
+      );
+    } else {
+      return getWebView(widget.url1);
+    }
+  }
+
+  Widget getWebView(String url){
+    return WebView(
+      initialUrl: url,
       javaScriptMode: JavaScriptMode.unrestricted,
       gestureRecognizers: <OneSequenceGestureRecognizer>[
         new VerticalDragGestureRecognizer()
@@ -88,7 +117,7 @@ class BookmarkButton extends StatefulWidget {
 
 class BookmarkButtonState extends State<BookmarkButton> {
   bool bookmarked = false;
-  var message = "";
+  String message = "";
 
   @override
   Widget build(BuildContext context) {
@@ -111,27 +140,3 @@ class BookmarkButtonState extends State<BookmarkButton> {
     );
   }
 }
-
-//class SampleMenu extends StatelessWidget {
-//  const SampleMenu();
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return PopupMenuButton<String>(
-//      onSelected: (String value) {
-//        Scaffold.of(context).showSnackBar(
-//            new SnackBar(content: new Text('You selected: $value')));
-//      },
-//      itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-//            const PopupMenuItem<String>(
-//              value: 'Item 1',
-//              child: Text('Item 1'),
-//            ),
-//            const PopupMenuItem<String>(
-//              value: 'Item 2',
-//              child: Text('Item 2'),
-//            ),
-//          ],
-//    );
-//  }
-//}
