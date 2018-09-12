@@ -175,21 +175,40 @@ class BookmarkButtonState extends State<BookmarkButton> {
 
   @override
   Widget build(BuildContext context) {
+
     return IconButton(
-      icon: Icon(bookmarked ? Icons.favorite : Icons.favorite_border),
-      onPressed: () {
-        if (bookmarked) {
-          setState(() {
-            message = "Unbookmarked";
-            bookmarked = false;
-          });
-        } else {
-          setState(() {
-            message = "Bookmarked";
-            bookmarked = true;
-          });
-        }
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(message)));
+      icon: Icon(Icons.info),
+      onPressed: _showDialog,
+    );
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog<Null>(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text("Flutter WebView Demo"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              FlutterLogo(style: FlutterLogoStyle.horizontal, size: 80.0,),
+              Text("This dialog is drawn by Flutter."),
+              Text("The WebView is from Android."),
+            ],
+          ),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }
