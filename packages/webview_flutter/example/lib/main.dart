@@ -69,43 +69,97 @@ class AnimatedWebViewTab extends StatefulWidget {
 
 class _AnimatedWebViewTabState extends State<AnimatedWebViewTab>
     with AutomaticKeepAliveClientMixin {
-  bool _first = true;
+  List<Widget> web_views = <Widget>[];
+
+  num page1_opacity;
+  num page2_opacity;
+
+  @override
+  void initState() {
+    if (widget.url2 != null) {
+      web_views.addAll([
+        FadeWebView(
+          url: widget.url2,
+          opacityLevel: 1.0,
+        ),
+        FadeWebView(
+          url: widget.url1,
+          opacityLevel: 1.0,
+        ),
+      ]);
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if(widget.url2 != null) {
-      return GestureDetector(
-        onDoubleTap: () {
-          setState(() {
-            _first = !_first;
-          });
-        },
-        child: AnimatedCrossFade(
-          duration: const Duration(seconds: 3),
-          firstChild: getWebView(widget.url1),
-          secondChild: getWebView(widget.url2),
-          crossFadeState:
-          _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-        ),
+    if (widget.url2 != null) {
+      return Stack(
+        children: web_views,
       );
     } else {
-      return getWebView(widget.url1);
+      return MyWebView(url: widget.url1);
     }
-  }
-
-  Widget getWebView(String url){
-    return WebView(
-      initialUrl: url,
-      javaScriptMode: JavaScriptMode.unrestricted,
-      gestureRecognizers: <OneSequenceGestureRecognizer>[
-        new VerticalDragGestureRecognizer()
-      ],
-    );
   }
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class MyWebView extends StatelessWidget {
+  MyWebView({Key key, this.url}) : super(key: key);
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return WebView(
+      initialUrl: url,
+      javaScriptMode: JavaScriptMode.unrestricted,
+      gestureRecognizers: <OneSequenceGestureRecognizer>[
+        new VerticalDragGestureRecognizer(),
+        new TapGestureRecognizer()
+      ],
+    );
+  }
+}
+
+class FadeWebView extends StatefulWidget {
+  FadeWebView({Key key, this.url, this.opacityLevel}) : super(key: key);
+
+  final String url;
+  final double opacityLevel;
+
+  @override
+  _FadeWebViewState createState() => _FadeWebViewState();
+}
+
+class _FadeWebViewState extends State<FadeWebView> {
+  double opacityLevel;
+
+  @override
+  void initState() {
+    opacityLevel = widget.opacityLevel;
+    super.initState();
+  }
+
+  void _changeOpacity() {
+    setState(() => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: _changeOpacity,
+      child: AnimatedOpacity(
+        opacity: opacityLevel,
+        duration: new Duration(seconds: 3),
+        child: MyWebView(url: widget.url),
+      ),
+    );
+  }
 }
 
 class BookmarkButton extends StatefulWidget {

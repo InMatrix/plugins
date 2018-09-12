@@ -76,7 +76,7 @@ class _WebViewState extends State<WebView> {
         // text selection.
         // TODO(amirh): remove this when the selection handles crash is resolved.
         // https://github.com/flutter/flutter/issues/21239
-        onLongPress: () {},
+//        onLongPress: () {},
         child: AndroidView(
           viewType: 'plugins.flutter.io/webview',
           onPlatformViewCreated: _onPlatformViewCreated,
