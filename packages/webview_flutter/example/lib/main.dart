@@ -30,14 +30,18 @@ class WebViewExampleState extends State<WebViewExample>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter WebView example'),
+        title: GestureDetector(
+            onLongPress: (){
+              print("long pressed.");
+            },
+            child: const Text('Flutter WebView Demo')),
         bottom: new TabBar(
           controller: tabController,
           tabs: tabs.map((String url) => new Tab(text: url)).toList(),
         ),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         actions: <Widget>[
-          BookmarkButton(),
+          InfoButton(),
         ],
       ),
       body: new TabBarView(
@@ -70,9 +74,6 @@ class AnimatedWebViewTab extends StatefulWidget {
 class _AnimatedWebViewTabState extends State<AnimatedWebViewTab>
     with AutomaticKeepAliveClientMixin {
   List<Widget> web_views = <Widget>[];
-
-  num page1_opacity;
-  num page2_opacity;
 
   @override
   void initState() {
@@ -145,14 +146,15 @@ class _FadeWebViewState extends State<FadeWebView> {
     super.initState();
   }
 
-  void _changeOpacity() {
+  void _changeOpacity(ScaleEndDetails s) {
+
     setState(() => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: _changeOpacity,
+      onScaleEnd: _changeOpacity,
       child: AnimatedOpacity(
         opacity: opacityLevel,
         duration: new Duration(seconds: 3),
@@ -162,14 +164,14 @@ class _FadeWebViewState extends State<FadeWebView> {
   }
 }
 
-class BookmarkButton extends StatefulWidget {
+class InfoButton extends StatefulWidget {
   @override
-  BookmarkButtonState createState() {
-    return new BookmarkButtonState();
+  InfoButtonState createState() {
+    return new InfoButtonState();
   }
 }
 
-class BookmarkButtonState extends State<BookmarkButton> {
+class InfoButtonState extends State<InfoButton> {
   bool bookmarked = false;
   String message = "";
 
@@ -194,9 +196,9 @@ class BookmarkButtonState extends State<BookmarkButton> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Text("这个对话框是Flutter的组件。"),
               FlutterLogo(style: FlutterLogoStyle.horizontal, size: 80.0,),
-              Text("This dialog is drawn by Flutter."),
-              Text("The WebView is from Android."),
+              Text("下面这个WebView是安卓自带的。"),
             ],
           ),
           actions: <Widget>[
