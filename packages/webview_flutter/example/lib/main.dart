@@ -30,11 +30,7 @@ class WebViewExampleState extends State<WebViewExample>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-            onLongPress: (){
-              print("long pressed.");
-            },
-            child: const Text('Flutter WebView Demo')),
+        title: const Text('Flutter WebView Demo'),
         bottom: new TabBar(
           controller: tabController,
           tabs: tabs.map((String url) => new Tab(text: url)).toList(),
@@ -146,15 +142,14 @@ class _FadeWebViewState extends State<FadeWebView> {
     super.initState();
   }
 
-  void _changeOpacity(ScaleEndDetails s) {
-
+  void _changeOpacity() {
     setState(() => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onScaleEnd: _changeOpacity,
+      onDoubleTap: _changeOpacity,
       child: AnimatedOpacity(
         opacity: opacityLevel,
         duration: new Duration(seconds: 3),
